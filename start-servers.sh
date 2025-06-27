@@ -1,8 +1,11 @@
 #!/bin/bash
 
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # Start backend server
 echo "Starting backend server on port 5001..."
-cd /Users/sirilgade/tax-calculator/backend
+cd "$SCRIPT_DIR/backend"
 node server.js &
 BACKEND_PID=$!
 echo "Backend started with PID: $BACKEND_PID"
@@ -12,7 +15,7 @@ sleep 3
 
 # Start frontend server
 echo "Starting frontend server on port 3001..."
-cd /Users/sirilgade/tax-calculator
+cd "$SCRIPT_DIR"
 PORT=3001 npm start &
 FRONTEND_PID=$!
 echo "Frontend started with PID: $FRONTEND_PID"
