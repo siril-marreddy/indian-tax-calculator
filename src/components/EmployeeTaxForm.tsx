@@ -8,49 +8,64 @@ interface EmployeeTaxFormProps {
 }
 
 export const EmployeeTaxForm: React.FC<EmployeeTaxFormProps> = ({ onCalculate }) => {
-  // Initialize form state with default values
-  const [formData, setFormData] = useState<EmployeeData>({
-    name: '',
-    pan: '',
-    age: 30,
-    gender: 'male',
-    income: {
-      basicSalary: 0,
-      hra: 0,
-      specialAllowance: 0,
-      otherAllowances: 0,
-      bonus: 0,
-      commission: 0,
-      otherIncome: 0
-    },
-    investments: {
-      ppf: 0,
-      epf: 0,
-      elss: 0,
-      lifeInsurance: 0,
-      nsc: 0,
-      tuitionFees: 0,
-      homeLoanPrincipal: 0,
-      sukanya: 0,
-      taxSavingFD: 0,
-      nps: 0,
-      healthInsurance: {
-        self: 0,
-        parents: 0,
-        parentAge: 55
-      },
-      savingsInterest: 0,
-      donations: 0
-    },
-    loans: {
-      homeLoanInterest: 0,
-      educationLoanInterest: 0
-    },
-    deductions: {
-      rentPaid: 0,
-      metroCity: false
+  // Load saved form data from localStorage
+  const loadSavedData = (): EmployeeData => {
+    const savedData = localStorage.getItem('taxFormData');
+    if (savedData) {
+      try {
+        return JSON.parse(savedData);
+      } catch (e) {
+        // If parse fails, return default values
+      }
     }
-  });
+    
+    // Default values
+    return {
+      name: '',
+      pan: '',
+      age: 30,
+      gender: 'male',
+      income: {
+        basicSalary: 0,
+        hra: 0,
+        specialAllowance: 0,
+        otherAllowances: 0,
+        bonus: 0,
+        commission: 0,
+        otherIncome: 0
+      },
+      investments: {
+        ppf: 0,
+        epf: 0,
+        elss: 0,
+        lifeInsurance: 0,
+        nsc: 0,
+        tuitionFees: 0,
+        homeLoanPrincipal: 0,
+        sukanya: 0,
+        taxSavingFD: 0,
+        nps: 0,
+        healthInsurance: {
+          self: 0,
+          parents: 0,
+          parentAge: 55
+        },
+        savingsInterest: 0,
+        donations: 0
+      },
+      loans: {
+        homeLoanInterest: 0,
+        educationLoanInterest: 0
+      },
+      deductions: {
+        rentPaid: 0,
+        metroCity: false
+      }
+    };
+  };
+
+  // Initialize form state with saved data or default values
+  const [formData, setFormData] = useState<EmployeeData>(loadSavedData());
 
   // Current section for multi-step form
   const [currentSection, setCurrentSection] = useState(0);
@@ -62,6 +77,11 @@ export const EmployeeTaxForm: React.FC<EmployeeTaxFormProps> = ({ onCalculate })
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentSection]);
+
+  // Save form data to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('taxFormData', JSON.stringify(formData));
+  }, [formData]);
 
   // Handle input changes for nested objects
   const handleInputChange = (section: string, field: string, value: any) => {
@@ -613,6 +633,25 @@ export const EmployeeTaxForm: React.FC<EmployeeTaxFormProps> = ({ onCalculate })
         </div>
       )}
 
+
+      {/* Clear form button */}
+      {currentSection === 0 && (
+        <div style={{ textAlign: 'right', marginBottom: '10px' }}>
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => {
+              if (window.confirm('Are you sure you want to clear all form data?')) {
+                localStorage.removeItem('taxFormData');
+                window.location.reload();
+              }
+            }}
+            style={{ fontSize: '14px', padding: '8px 16px' }}
+          >
+            Clear Form
+          </button>
+        </div>
+      )}
 
       {/* Navigation buttons */}
       <div className="form-navigation">

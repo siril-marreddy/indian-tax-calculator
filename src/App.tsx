@@ -8,12 +8,14 @@ function App() {
   const [taxResult, setTaxResult] = useState<TaxComparison | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showResults, setShowResults] = useState(false);
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
   const handleCalculate = async (employeeData: EmployeeData) => {
     setLoading(true);
     setError(null);
+    setShowResults(false);
     
     try {
       const response = await fetch(`${API_URL}/api/tax/calculate`, {
@@ -31,6 +33,7 @@ function App() {
 
       const result = await response.json();
       setTaxResult(result.data);
+      setShowResults(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       console.error('Tax calculation error:', err);
@@ -67,7 +70,7 @@ function App() {
           </div>
         )}
         
-        {!loading && !error && <TaxResults result={taxResult} />}
+        {!loading && !error && showResults && <TaxResults result={taxResult} />}
       </main>
       
       <footer className="App-footer">
