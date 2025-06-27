@@ -4,20 +4,51 @@
 /node_modules
 /.pnp
 .pnp.js
+backend/node_modules
 
 # testing
 /coverage
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
+# logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
+backend/*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+backend/tax_calculator.db
+
+# Editor directories
+.idea
+.vscode
+*.swp
+*.swo
+
+# PM2
+.pm2
+
+# Backup files
+*.backup
+*.bak
+BACKUP_*
+
+# Temporary files
+*.tmp
+*.temp
+.cache
