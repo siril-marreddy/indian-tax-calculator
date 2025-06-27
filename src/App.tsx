@@ -9,12 +9,14 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
   const handleCalculate = async (employeeData: EmployeeData) => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:5001/api/tax/calculate', {
+      const response = await fetch(`${API_URL}/api/tax/calculate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
