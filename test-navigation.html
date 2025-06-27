@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Navigation</title>
+    <style>
+        .form-section { padding: 20px; border: 1px solid #ccc; margin: 10px; }
+        .hidden { display: none; }
+        .error { color: red; }
+        button { padding: 10px 20px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Test Form Navigation</h1>
+    
+    <div id="section0" class="form-section">
+        <h2>Section 0: Personal Info</h2>
+        <input type="text" id="name" placeholder="Name" required>
+        <input type="text" id="pan" placeholder="PAN" pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}" required>
+        <input type="number" id="age" placeholder="Age" min="18" max="100" required>
+    </div>
+    
+    <div id="section1" class="form-section hidden">
+        <h2>Section 1: Income</h2>
+        <input type="number" id="salary" placeholder="Basic Salary" min="1" required>
+    </div>
+    
+    <div id="section2" class="form-section hidden">
+        <h2>Section 2: Investments</h2>
+        <input type="number" id="ppf" placeholder="PPF">
+    </div>
+    
+    <div id="section3" class="form-section hidden">
+        <h2>Section 3: Loans & Rent</h2>
+        <input type="number" id="rent" placeholder="Rent">
+    </div>
+    
+    <div id="navigation">
+        <button onclick="navigate(-1)">Previous</button>
+        <button onclick="navigate(1)">Next</button>
+    </div>
+    
+    <div id="errors" class="error"></div>
+    
+    <script>
+        let currentSection = 0;
+        const totalSections = 4;
+        
+        function showSection(index) {
+            for (let i = 0; i < totalSections; i++) {
+                document.getElementById(`section${i}`).classList.toggle('hidden', i !== index);
+            }
+        }
+        
+        function validateSection(index) {
+            const errors = [];
+            
+            if (index === 0) {
+                const name = document.getElementById('name').value;
+                const pan = document.getElementById('pan').value;
+                const age = document.getElementById('age').value;
+                
+                if (!name || name.length < 3) errors.push('Name must be at least 3 characters');
+                if (!pan || !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) errors.push('Invalid PAN format');
+                if (!age || age < 18 || age > 100) errors.push('Age must be between 18 and 100');
+            } else if (index === 1) {
+                const salary = document.getElementById('salary').value;
+                if (!salary || salary <= 0) errors.push('Salary must be greater than 0');
+            }
+            
+            document.getElementById('errors').innerHTML = errors.join('<br>');
+            return errors.length === 0;
+        }
+        
+        function navigate(direction) {
+            const newSection = currentSection + direction;
+            
+            if (newSection < 0 || newSection >= totalSections) return;
+            
+            if (direction > 0 && !validateSection(currentSection)) {
+                alert('Please fix validation errors');
+                return;
+            }
+            
+            currentSection = newSection;
+            showSection(currentSection);
+        }
+        
+        // Show initial section
+        showSection(0);
+    </script>
+</body>
+</html>

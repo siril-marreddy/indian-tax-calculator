@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EmployeeData } from '../types/indianTax';
-import { validateTaxForm, validatePAN, ValidationError } from '../utils/validation';
+import { validateTaxForm, ValidationError } from '../utils/validation';
 import './EmployeeTaxForm.css';
 
 interface EmployeeTaxFormProps {
@@ -58,6 +58,11 @@ export const EmployeeTaxForm: React.FC<EmployeeTaxFormProps> = ({ onCalculate })
   // Validation errors state
   const [errors, setErrors] = useState<ValidationError[]>([]);
 
+  // Scroll to top when section changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentSection]);
+
   // Handle input changes for nested objects
   const handleInputChange = (section: string, field: string, value: any) => {
     setFormData(prev => {
@@ -113,7 +118,7 @@ export const EmployeeTaxForm: React.FC<EmployeeTaxFormProps> = ({ onCalculate })
         break;
         
       case 1: // Income Details
-        if (!formData.income.basicSalary || formData.income.basicSalary <= 0) {
+        if (!formData.income.basicSalary || formData.income.basicSalary < 1) {
           sectionErrors.push({ field: 'basicSalary', message: 'Basic salary is required and must be greater than 0' });
         }
         break;
@@ -124,7 +129,12 @@ export const EmployeeTaxForm: React.FC<EmployeeTaxFormProps> = ({ onCalculate })
         const section80CTotal = (formData.investments.ppf || 0) +
           (formData.investments.epf || 0) +
           (formData.investments.elss || 0) +
-          (formData.investments.lifeInsurance || 0);
+          (formData.investments.lifeInsurance || 0) +
+          (formData.investments.nsc || 0) +
+          (formData.investments.tuitionFees || 0) +
+          (formData.investments.homeLoanPrincipal || 0) +
+          (formData.investments.sukanya || 0) +
+          (formData.investments.taxSavingFD || 0);
           
         if (section80CTotal > 150000) {
           sectionErrors.push({ 
@@ -202,7 +212,24 @@ export const EmployeeTaxForm: React.FC<EmployeeTaxFormProps> = ({ onCalculate })
           <div 
             key={index}
             className={`progress-step ${index === currentSection ? 'active' : ''} ${index < currentSection ? 'completed' : ''}`}
-            onClick={() => setCurrentSection(index)}
+            onClick={() => {
+              // Allow navigation to previous sections or validate before going forward
+              if (index < currentSection) {
+                setCurrentSection(index);
+              } else if (index > currentSection) {
+                // Validate all sections up to the target
+                let canNavigate = true;
+                for (let i = currentSection; i < index; i++) {
+                  if (!validateSection(i)) {
+                    canNavigate = false;
+                    break;
+                  }
+                }
+                if (canNavigate) {
+                  setCurrentSection(index);
+                }
+              }
+            }}
           >
             <span className="step-icon">{section.icon}</span>
             <span className="step-title">{section.title}</span>
@@ -585,6 +612,7 @@ export const EmployeeTaxForm: React.FC<EmployeeTaxFormProps> = ({ onCalculate })
           </div>
         </div>
       )}
+
 
       {/* Navigation buttons */}
       <div className="form-navigation">
